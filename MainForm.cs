@@ -1047,7 +1047,7 @@ namespace ProScanMultiUpdater
         {
             System.Diagnostics.Process.Start(new ProcessStartInfo
             {
-                FileName = "https://github.com/pahtzo/ProScanMultiUpdater",
+                FileName = "https://github.com/pahtzo/ProScanMultiUpdater/tree/main?tab=readme-ov-file#readme",
                 UseShellExecute = true
             });
 
