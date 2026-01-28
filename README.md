@@ -42,30 +42,38 @@ ProScanMultiUpdater simplifies the process of updating multiple ProScan installa
 
 ## How to Use
 
-### Step 1: Backup your system and/or ProScan install directories (Optional but recommended)
+Backup your system and/or ProScan install directories (Optional but recommended)
 Although the ProScanMultiUpdater does not touch any configuration, recordings, or data files, it is ***highly recommended*** to backup your ProScan install directories using whatever means you already have in place for backups before updating!
 
 If you have any ProScan **"Profile Editor"** or **"Favorite Editor"** windows open you ***must*** save your work and close those before updating the
 running ProScan instances (leave the actual ProScan instances running, don't close those).
 
-### Step 2: Launch ProScanMultiUpdater
+### Quick Update Steps
+Close Profile Editor and Favorite Editor before continuing!
+- Launch ProScanMultiUpdater
+- Select Processes to Update
+- Close Selected Instances & Update (Yes download latest, Yes confirm updates)
+
+### Detailed and Optional Update Steps
+
+### Step 1: Launch ProScanMultiUpdater
 Download the latest version from the Releases page and launch the application.  Windows will auto-detect if it's running elevated.  If the app
 isn't running elevated, Windows will prompt for UAC elevation.
 
-### Step 3: Scan For Running ProScan Instances (Optional)
+### Step 2: Scan For Running ProScan Instances (Optional)
 1. Every time it's launched the application will automatically detect all running ProScan instances
 2. Review the list in the data grid
 3. Optional, to refresh the process listing click **"Scan For Running ProScan Instances"** (after running updates the process list is cleared so you can use this to re-populate it)
 
-### Step 4: Select Processes to Update
+### Step 3: Select Processes to Update
 - Select the process instances you want to update in the grid view
 - Use **"Select All"** or **"Deselect All"** for convenience
 
-### Step 5: Browse - Choose a ProScan Setup Installer (Optional)
+### Step 4: Browse - Choose a ProScan Setup Installer (Optional)
 - Click **"Browse"** to manually select an already downloaded and extracted ProScan installer
 - Or proceed without manually selecting - the app will offer to download the latest version
 
-### Step 6: Restart Processes (Optional)
+### Step 5: Restart Processes (Optional)
 - **If "Restart Updated Instances" is checked:** (default Yes)
   - Processes will automatically restart as their original users
   - Each process is relaunched with the same privileges it had before
@@ -74,9 +82,9 @@ isn't running elevated, Windows will prompt for UAC elevation.
   - Processes will not restart automatically
   - You have to manually start your ProScan instances when complete
 
-### Step 7: Close Selected Instances & Update
+### Step 6: Close Selected Instances & Update
 1. Click **"Close Selected Instances & Update"**
-2. You'll be prompted to download the latest version from the ProScan website, otherwise the updater will use the manually selected installer you selected in Step 5
+2. You'll be prompted to download the latest version from the ProScan website, otherwise the updater will use the manually selected installer you selected in Step 4
 3. Confirm the update operation
 4. The updater will:
    - Switch to the Logging tab
@@ -85,15 +93,9 @@ isn't running elevated, Windows will prompt for UAC elevation.
    - Run the installer for each unique installation directory
    - Wait for each installer to complete
 
-### Step 8: Save Log As (Optional)
+### Step 7: Save Log As (Optional)
 - Right-Click in the logging output and **"Save Log As"** to save the complete update log
 - Logs include timestamps, installer output, and any errors encountered
-
-### Quick Update Steps
-Close Profile Editor and Favorite Editor before continuing!
-- Launch ProScanMultiUpdater
-- Select Processes to Update
-- Close Selected Instances & Update (Yes download latest, Yes confirm updates)
 
 ## Key Features
 
