@@ -167,6 +167,4 @@ before launching the updater or clicking **"Scan For Running ProScan Instances"*
 ## Bugs & Issues
 
 For bug and issue reporting:
-- **ProScanMultiUpdater**: Open a detailed issue in this project's GitHub Issue Tracker and submit the `ProScanMultiUpdater-YYYY-MM-DD-HHMMSS.txt` log saved from the Logging tab view.
-
-
+- **ProScanMultiUpdater**: Open a detailed issue in this project's GitHub Issue Tracker. Right-Click in the Logging tab view and select "Save Log As" to save the complete update log to your PC, it may be requested for more details on the bug/issue.  The filename will have this format: `ProScanMultiUpdater-YYYY-MM-DD-HHMMSS.txt`
