@@ -140,7 +140,7 @@ The updater runs the ProScan installer (Inno Setup) with the following parameter
 - `/MERGETASKS="!desktopicon"` - Disable desktop icon creation
 - `/DIR="<path>"` - Installs to existing directory (in-place update)
 - `/LOG="<path>\ProScanMultiUpdater-install.log"` - Creates custom-named installation log
-- `/FORCECLOSEAPPLICATIONS` - Force-close application for update (they should already be closed at this point)
+- `/FORCECLOSEAPPLICATIONS` - Force-close application for update (in the unlikely event ProScanMultiUpdater wasn't able to close them)
 
 ## Troubleshooting
 
