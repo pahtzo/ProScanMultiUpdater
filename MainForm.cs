@@ -35,6 +35,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net.Http;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text;
@@ -60,6 +61,10 @@ namespace ProScanMultiUpdater
         private static string osInfo = $"{dotNetVersion}; {GetWindowsVersion()}; {osArchitecture}";
         private static string u_agent = $"Mozilla/5.0 ({asmname}/{version} {osInfo})";
 
+        // Global TEMP zip file extract path.  So we can clean it up when this form is closing out.
+        private static string extract_path = String.Empty;
+        private bool _cleanupDone = false;
+
         private static readonly HttpClient sharedClient = new HttpClient
         {
             Timeout = System.Threading.Timeout.InfiniteTimeSpan // we control timeouts
@@ -68,7 +73,12 @@ namespace ProScanMultiUpdater
         public MainForm()
         {
             InitializeComponent();
-            this.HelpRequested += MainForm_HelpRequested; // F1 will open the github project page.
+            
+            // Hook ApplicationExit to cleanup our temp files.
+            // CleanupTempFiles is also called in FormClosing event.
+            Application.ApplicationExit += (_, __) => CleanupTempFiles();
+
+            this.HelpRequested += MainForm_HelpRequested; // F1 will open the GitHub project page.
             sharedClient.DefaultRequestHeaders.UserAgent.ParseAdd(u_agent);
 
             string tlsinfo = TlsBootstrapper.Initialize("https://proscan.org");
@@ -375,10 +385,11 @@ namespace ProScanMultiUpdater
             /*
              * The user selected to download the latest version so we're going to save and run that out of
              * the TEMP path.  A new sub-directory will be created under TEMP.
-             * The sub-directory and extracted EXE setup installer will remain after we're done,
-             * however the original downloaded ZIP file will be removed.
+             * The sub-directory and extracted EXE setup installer will remain until the user exits/closes
+             * this application.  This will cut down on repetitively downloading the installer if the user
+             * updates all instances by selecting only a subset to update multiple times.
              */
-            string downloadPath = Path.GetTempPath();
+            string downloadTempPath = Path.GetTempPath();
 
             try
             {
@@ -401,6 +412,7 @@ namespace ProScanMultiUpdater
                 string zipFileName = Path.GetFileName(new Uri(zipFileUrl).LocalPath);
                 txtOutput.AppendText($"Found: {zipFileUrl}\r\n");
 
+
                 /*
                  * Add MessageBoxDefaultButton.Button2 at the end to make "No" the default option.
                  */
@@ -412,27 +424,54 @@ namespace ProScanMultiUpdater
 
                 if (response != DialogResult.Yes)
                 {
-                    txtOutput.AppendText($"Download canceled by user.\r\n");
+                    txtOutput.AppendText($"Download latest version was declined.\r\n");
                     return;
                 }
 
                 txtOutput.AppendText($"Download latest version started at {DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}\r\n");
 
-                string downloadedFilePath = Path.Combine(downloadPath, zipFileName);
-                txtOutput.AppendText($"\nDownloading to: {downloadedFilePath}\r\n");
-//                
-                if(await DownloadFileAsync(zipFileUrl, downloadedFilePath) != true)
+                /*
+                 * Check if latest version was previously downloaded during this run session.
+                 */
+                extract_path = Path.Combine(downloadTempPath, Path.GetFileNameWithoutExtension(zipFileName));
+                txtOutput.AppendText($"\nChecking if latest version already exists in {extract_path}\r\n");
+
+                if (Directory.Exists(extract_path))
+                {
+                    string exefile = Path.GetFileNameWithoutExtension(zipFileName) + ".exe";
+                    string exefullpath = FindExeFile(extract_path, exefile);
+
+                    if (!string.IsNullOrEmpty(exefullpath))
+                    {
+                        txtSetupPath.Text = exefullpath;
+                        txtOutput.AppendText($"\nLatest installer already downloaded: {exefullpath}\r\n");
+                        return;
+                    }
+                    else
+                    {
+                        txtOutput.AppendText($"\nLatest installer has not been downloaded, continuing with download...\r\n");
+                    }
+                }
+
+
+                /*
+                 * We didn't detect a previous download and the user wants the latest version so we'll continue the download process.
+                 */
+                string downloadedZipFile = Path.Combine(downloadTempPath, zipFileName);
+                txtOutput.AppendText($"\nDownloading to: {downloadedZipFile}\r\n");
+                
+                if(await DownloadFileAsync(zipFileUrl, downloadedZipFile) != true)
                 {
                     txtOutput.AppendText($"Download canceled by user.\r\n");
                     return;
                 }
 
                 txtOutput.AppendText("Unblocking file...\r\n");
-                UnblockFile(downloadedFilePath);
+                UnblockFile(downloadedZipFile);
 
-                string extractPath = Path.Combine(downloadPath, Path.GetFileNameWithoutExtension(zipFileName));
+                string extractPath = Path.Combine(downloadTempPath, Path.GetFileNameWithoutExtension(zipFileName));
                 txtOutput.AppendText($"\nExtracting to: {extractPath}\r\n");
-                ExtractZipFile(downloadedFilePath, extractPath);
+                ExtractZipFile(downloadedZipFile, extractPath);
 
                 string exeFileName = Path.GetFileNameWithoutExtension(zipFileName) + ".exe";
                 string exePath = FindExeFile(extractPath, exeFileName);
@@ -440,7 +479,7 @@ namespace ProScanMultiUpdater
                 if (!string.IsNullOrEmpty(exePath))
                 {
                     txtSetupPath.Text = exePath;
-                    txtOutput.AppendText($"\nFound installer: {exePath}, changing to the downloaded version.\r\n");
+                    txtOutput.AppendText($"\nFound installer: {exePath}\r\n");
                 }
                 else
                 {
@@ -637,8 +676,9 @@ namespace ProScanMultiUpdater
 
             if (string.IsNullOrWhiteSpace(txtSetupPath.Text))
             {
-                MessageBox.Show("Please browse for the ProScan setup installer or confirm to download the latest version when prompted.", "Setup Path Required",
+                MessageBox.Show("Please browse for a ProScan setup installer or confirm to download the latest version when prompted.", "Setup Path Required",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                btnBrowse.Focus();
                 return;
             }
 
@@ -660,7 +700,7 @@ namespace ProScanMultiUpdater
 
             if (!ProScanSetupFingerprint.IsExpectedInstaller(txtSetupPath.Text))
             {
-                // NO GOOD
+                // Fingerprinting failed, the setup exe doesn't match what we're expecting.
                 txtOutput.AppendText($"The specified setup file {txtSetupPath.Text} is not a ProScan Setup Installer!\r\n\r\n");
                 MessageBox.Show($"The specified setup file {txtSetupPath.Text} is not a ProScan Setup Installer!", "Wrong Installer",
                     MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -1022,8 +1062,10 @@ namespace ProScanMultiUpdater
          * When the main form is loaded and presented run an initial process scan and pre-fill
          * the found procs count label.
          */
-        private void MainForm_Shown(object sender, EventArgs e)
+        private async void MainForm_Shown(object sender, EventArgs e)
         {
+            await CheckForUpdatesOnStartupAsync();
+
             BtnScan_Click(sender, e);
             labelProcsFound.Text = "Processes found: " + foundProcesses.Count;
         }
@@ -1052,6 +1094,97 @@ namespace ProScanMultiUpdater
             });
 
         }
+
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            CleanupTempFiles();
+        }
         
+        private void CleanupTempFiles()
+        {
+            if (_cleanupDone)
+                return;
+
+            _cleanupDone = true;
+
+            try
+            {
+                /*
+                 * if the user selected to download and install the latest version then
+                 * we'll clean up the temporary directory and exe to limit the reuse
+                 * on subsequent runs of this application.  i.e. each run will only
+                 * download the latest version once and use that exe until we exit.
+                 */
+                if (!String.IsNullOrEmpty(extract_path))
+                {
+                    if (Directory.Exists(extract_path))
+                    {
+                        Directory.Delete(extract_path, true);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Never throw during shutdown
+                Debug.WriteLine("CleanupTempFiles failed: " + ex);
+            }
+        }
+
+        /*
+         * Self-check if we have a newer release version available on our GitHub repo.
+         * If so, display that info to the user so they're aware of the new version.
+         */
+        private async Task CheckForUpdatesOnStartupAsync()
+        {
+            try
+            {
+                var checker = new UpdateChecker(
+                    owner: "pahtzo",
+                    repo: "ProScanMultiUpdater",
+                    assetHint: "windows-x64");
+
+                UpdateChecker.UpdateResult result = await checker.CheckAsync();
+
+                if (!result.IsUpdateAvailable)
+                    return;
+
+                linkLabelUpdate.Text = "New version available: " + result.AssetName + "  (Release notes | Download)";
+
+                linkLabelUpdate.Links.Clear();
+
+                linkLabelUpdate.Links.Add(
+                    linkLabelUpdate.Text.IndexOf("Release notes"),
+                    "Release notes".Length,
+                    result.ReleasePageUrl);
+
+                linkLabelUpdate.Links.Add(
+                    linkLabelUpdate.Text.IndexOf("Download"),
+                    "Download".Length,
+                    result.DownloadUrl);
+
+                linkLabelUpdate.Visible = true;
+                txtOutput.AppendText($"New version available: {result.ReleasePageUrl}\r\n");
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Update check failed: " + ex);
+            }
+        }
+
+        /*
+         * New update for our application was shown and the user clicked the release notes or download links.
+         */
+        private void linkLabelUpdate_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            string url = e.Link.LinkData as string;
+            if (string.IsNullOrEmpty(url))
+                return;
+
+            System.Diagnostics.Process.Start(new ProcessStartInfo
+            {
+                FileName = url,
+                UseShellExecute = true
+            });
+        }
     }
 }

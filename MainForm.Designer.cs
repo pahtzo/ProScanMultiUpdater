@@ -61,6 +61,7 @@ namespace ProScanMultiUpdater
             this.components = new System.ComponentModel.Container();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabMain = new System.Windows.Forms.TabPage();
+            this.linkLabelUpdate = new System.Windows.Forms.LinkLabel();
             this.checkBoxRestartProcs = new System.Windows.Forms.CheckBox();
             this.labelProcsFound = new System.Windows.Forms.Label();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
@@ -95,6 +96,7 @@ namespace ProScanMultiUpdater
             // 
             // tabMain
             // 
+            this.tabMain.Controls.Add(this.linkLabelUpdate);
             this.tabMain.Controls.Add(this.checkBoxRestartProcs);
             this.tabMain.Controls.Add(this.labelProcsFound);
             this.tabMain.Controls.Add(this.dataGridView1);
@@ -111,13 +113,23 @@ namespace ProScanMultiUpdater
             this.tabMain.TabIndex = 0;
             this.tabMain.Text = "Main";
             // 
+            // linkLabelUpdate
+            // 
+            this.linkLabelUpdate.AutoSize = true;
+            this.linkLabelUpdate.Location = new System.Drawing.Point(8, 6);
+            this.linkLabelUpdate.Name = "linkLabelUpdate";
+            this.linkLabelUpdate.Size = new System.Drawing.Size(0, 13);
+            this.linkLabelUpdate.TabIndex = 9;
+            this.linkLabelUpdate.Visible = false;
+            this.linkLabelUpdate.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabelUpdate_LinkClicked);
+            // 
             // checkBoxRestartProcs
             // 
             this.checkBoxRestartProcs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.checkBoxRestartProcs.AutoSize = true;
             this.checkBoxRestartProcs.Checked = true;
             this.checkBoxRestartProcs.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.checkBoxRestartProcs.Location = new System.Drawing.Point(505, 41);
+            this.checkBoxRestartProcs.Location = new System.Drawing.Point(505, 61);
             this.checkBoxRestartProcs.Name = "checkBoxRestartProcs";
             this.checkBoxRestartProcs.Size = new System.Drawing.Size(153, 17);
             this.checkBoxRestartProcs.TabIndex = 4;
@@ -127,7 +139,7 @@ namespace ProScanMultiUpdater
             // labelProcsFound
             // 
             this.labelProcsFound.AutoSize = true;
-            this.labelProcsFound.Location = new System.Drawing.Point(216, 78);
+            this.labelProcsFound.Location = new System.Drawing.Point(216, 98);
             this.labelProcsFound.Name = "labelProcsFound";
             this.labelProcsFound.Size = new System.Drawing.Size(98, 13);
             this.labelProcsFound.TabIndex = 8;
@@ -141,18 +153,18 @@ namespace ProScanMultiUpdater
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dataGridView1.Location = new System.Drawing.Point(3, 103);
+            this.dataGridView1.Location = new System.Drawing.Point(3, 123);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersVisible = false;
             this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridView1.Size = new System.Drawing.Size(870, 469);
+            this.dataGridView1.Size = new System.Drawing.Size(870, 449);
             this.dataGridView1.TabIndex = 7;
             this.dataGridView1.TabStop = false;
             // 
             // btnBrowse
             // 
             this.btnBrowse.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnBrowse.Location = new System.Drawing.Point(768, 3);
+            this.btnBrowse.Location = new System.Drawing.Point(768, 23);
             this.btnBrowse.Name = "btnBrowse";
             this.btnBrowse.Size = new System.Drawing.Size(100, 23);
             this.btnBrowse.TabIndex = 0;
@@ -163,7 +175,7 @@ namespace ProScanMultiUpdater
             // 
             this.txtSetupPath.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtSetupPath.Location = new System.Drawing.Point(135, 5);
+            this.txtSetupPath.Location = new System.Drawing.Point(135, 25);
             this.txtSetupPath.Name = "txtSetupPath";
             this.txtSetupPath.ReadOnly = true;
             this.txtSetupPath.Size = new System.Drawing.Size(628, 20);
@@ -173,7 +185,7 @@ namespace ProScanMultiUpdater
             // lblSetupPath
             // 
             this.lblSetupPath.AutoSize = true;
-            this.lblSetupPath.Location = new System.Drawing.Point(8, 8);
+            this.lblSetupPath.Location = new System.Drawing.Point(8, 28);
             this.lblSetupPath.Name = "lblSetupPath";
             this.lblSetupPath.Size = new System.Drawing.Size(121, 13);
             this.lblSetupPath.TabIndex = 6;
@@ -181,7 +193,7 @@ namespace ProScanMultiUpdater
             // 
             // btnDeselectAll
             // 
-            this.btnDeselectAll.Location = new System.Drawing.Point(83, 71);
+            this.btnDeselectAll.Location = new System.Drawing.Point(83, 91);
             this.btnDeselectAll.Name = "btnDeselectAll";
             this.btnDeselectAll.Size = new System.Drawing.Size(71, 26);
             this.btnDeselectAll.TabIndex = 3;
@@ -190,7 +202,7 @@ namespace ProScanMultiUpdater
             // 
             // btnSelectAll
             // 
-            this.btnSelectAll.Location = new System.Drawing.Point(6, 71);
+            this.btnSelectAll.Location = new System.Drawing.Point(6, 91);
             this.btnSelectAll.Name = "btnSelectAll";
             this.btnSelectAll.Size = new System.Drawing.Size(71, 26);
             this.btnSelectAll.TabIndex = 2;
@@ -201,7 +213,7 @@ namespace ProScanMultiUpdater
             // 
             this.btnKillAndUpdate.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnKillAndUpdate.Enabled = false;
-            this.btnKillAndUpdate.Location = new System.Drawing.Point(664, 35);
+            this.btnKillAndUpdate.Location = new System.Drawing.Point(664, 55);
             this.btnKillAndUpdate.Name = "btnKillAndUpdate";
             this.btnKillAndUpdate.Size = new System.Drawing.Size(204, 26);
             this.btnKillAndUpdate.TabIndex = 5;
@@ -210,7 +222,7 @@ namespace ProScanMultiUpdater
             // 
             // btnScan
             // 
-            this.btnScan.Location = new System.Drawing.Point(7, 35);
+            this.btnScan.Location = new System.Drawing.Point(7, 55);
             this.btnScan.Name = "btnScan";
             this.btnScan.Size = new System.Drawing.Size(204, 26);
             this.btnScan.TabIndex = 1;
@@ -222,7 +234,7 @@ namespace ProScanMultiUpdater
             this.tabLogging.Controls.Add(this.txtOutput);
             this.tabLogging.Location = new System.Drawing.Point(4, 22);
             this.tabLogging.Name = "tabLogging";
-            this.tabLogging.Size = new System.Drawing.Size(916, 575);
+            this.tabLogging.Size = new System.Drawing.Size(876, 575);
             this.tabLogging.TabIndex = 1;
             this.tabLogging.Text = "Logging";
             // 
@@ -236,7 +248,7 @@ namespace ProScanMultiUpdater
             this.txtOutput.Name = "txtOutput";
             this.txtOutput.ReadOnly = true;
             this.txtOutput.ScrollBars = System.Windows.Forms.ScrollBars.Both;
-            this.txtOutput.Size = new System.Drawing.Size(916, 575);
+            this.txtOutput.Size = new System.Drawing.Size(876, 575);
             this.txtOutput.TabIndex = 0;
             this.txtOutput.WordWrap = false;
             this.txtOutput.TextChanged += new System.EventHandler(this.txtOutput_TextChanged);
@@ -263,6 +275,7 @@ namespace ProScanMultiUpdater
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "ProScanMultiUpdater";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.Shown += new System.EventHandler(this.MainForm_Shown);
             this.tabControl1.ResumeLayout(false);
             this.tabMain.ResumeLayout(false);
@@ -277,5 +290,6 @@ namespace ProScanMultiUpdater
 
         private System.Windows.Forms.Label labelProcsFound;
         private System.Windows.Forms.CheckBox checkBoxRestartProcs;
+        private System.Windows.Forms.LinkLabel linkLabelUpdate;
     }
 }

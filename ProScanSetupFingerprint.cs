@@ -36,7 +36,7 @@ using System.Xml.Linq;
 
 namespace ProScanMultiUpdater
 {
-    internal class ProScanSetupFingerprint
+    internal sealed class ProScanSetupFingerprint
     {
         private const int LOAD_LIBRARY_AS_DATAFILE = 0x00000002;
         private const int RT_MANIFEST = 24;

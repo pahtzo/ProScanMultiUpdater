@@ -37,7 +37,7 @@ using System.Security.Authentication;
 
 namespace ProScanMultiUpdater
 {
-    internal class TlsBootstrapper
+    internal sealed class TlsBootstrapper
     {
         /// <summary>
         /// Initializes TLS policy.
